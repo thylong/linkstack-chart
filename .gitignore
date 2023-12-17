@@ -1,0 +1,10 @@
+# Temporary files generated when testing charts locally
+deploy/**/*.tgz
+deploy/**/Chart.lock
+
+# editors
+.vscode
+.idea
+
+# MacOS
+.DS_Store
