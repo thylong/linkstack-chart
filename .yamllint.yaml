@@ -1,0 +1,12 @@
+extends: default
+
+rules:
+  document-start: disable
+  line-length: disable
+  indentation:
+    spaces: 2
+    indent-sequences: "consistent"
+  comments: "enable"
+  empty-values: "enable"
+ignore: |
+  templates/
