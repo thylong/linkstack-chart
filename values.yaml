@@ -6,7 +6,14 @@
 linkstack:
   # -- Datastore to use (either sqlite or mysql)
   backend: sqlite
-  php_memory_limit: 512M
+  env:
+    php_memory_limit: 512M
+    upload_max_filesize: '8M'
+    tz: 'Europe/Paris'
+    # server_admin: 'admin@example.com'
+    # http_server_name: 'example.com'
+    # https_server_name: 'example.com'
+    log_level: 'info'
 
 nameOverride: ""
 fullnameOverride: ""

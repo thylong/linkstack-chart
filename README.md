@@ -25,7 +25,7 @@ A LinkStack unofficial Helm chart
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` | Name of the ingress class to route through this application |
 | ingress.enabled | bool | `false` |  |
-| linkstack | object | `{"backend":"sqlite","php_memory_limit":"512M"}` | Linkstack specific configuration |
+| linkstack | object | `{"backend":"sqlite","env":{"log_level":"info","php_memory_limit":"512M","tz":"Europe/Paris","upload_max_filesize":"8M"}}` | Linkstack specific configuration |
 | linkstack.backend | string | `"sqlite"` | Datastore to use (either sqlite or mysql) |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | Assign pods to nodes matching specific label. |
