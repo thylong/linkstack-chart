@@ -1,0 +1,15 @@
+{{- if contains "sqlite" .Values.linkstack.backend }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: '{{ include "linkstack.fullname" . }}-sqlite'
+  labels:
+    {{- include "linkstack.labels" . | nindent 4 }}
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /htdocs
+{{- end }}
