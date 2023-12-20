@@ -46,9 +46,12 @@ securityContext: {}
 #   capabilities:
 #     drop:
 #     - ALL
-#   readOnlyRootFilesystem: true
-#   runAsNonRoot: true
-#   runAsUser: 1000
+# allowPrivilegeEscalation: false
+# runAsNonRoot: true
+# runAsUser: 100
+# runAsGroup: 101
+# fsGroup: 101
+# readOnlyRootFilesystem: true
 
 service:
   type: ClusterIP
