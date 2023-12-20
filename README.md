@@ -4,13 +4,34 @@
 
 A LinkStack unofficial Helm chart
 
+This helm chart offers a way to schedule a [linstack](https://linkstack.org/) instance on a K8s cluster.
+
+The chart currently supports:
+- Basic setup with sqlite as backend
+- Basic setup with mysql as backend
+- PersistentVolume to store data
+
+## Getting Started
+
+### Requirement
+
+Helm (version >= 3) and a functional kubernetes cluster (>=1.24) are the sole dependencies.
+
+### Basic install
+
+```bash
+helm install -f values.yaml linkstack .
+```
+
+## Features considered
+
+- [ ] Optional pre-defined Network Policy
+- [ ] Optional pre-defined securityContext
+- [ ] Already setup linkstack installation through Helm
+
+## References
+
 **Homepage:** <https://linkstack.org/>
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Théotime LEVEQUE | <thylong@pm.me> |  |
 
 ## Values
 
@@ -45,3 +66,15 @@ A LinkStack unofficial Helm chart
 | tolerations | list | `[]` | Tolerations lift taint constraints with a tradeoff on scheduling guarantees. |
 | volumeMounts | list | `[{"mountPath":"/htdocs","name":"linkstack-sqlite","readOnly":false}]` | Additional volumeMounts on the output Deployment definition. |
 | volumes | list | `[{"name":"linkstack-sqlite","persistentVolumeClaim":{"claimName":"linkstack-sqlite-pvc"}}]` | Additional volumes on the output Deployment definition. |
+
+## License
+
+[![License: AGPL v3](https://img.lss.ovh/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
+As of version 4.0.0, the license for this project has been updated to the GNU Affero General Public License v3.0, which explicitly requires that any modifications made to the project must be made public. This license also requires that a copyright notice and license notice be included in any copies or derivative works of the project.
+
+Additionally, any changes made to the project must be clearly stated, and the source code for the modified version must be made available to anyone who receives the modified version. Network use of the project is also considered distribution, and as such, any network use of the project must comply with the terms of the license.
+
+Finally, any derivative works of the project must be licensed under the same license terms as the original project.
+
+[Read more here](https://www.gnu.org/licenses/agpl-3.0)
