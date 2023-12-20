@@ -29,7 +29,11 @@ spec:
       initContainers:
         - name: cp
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          command: ["/bin/ash", "-c", "sleep 1 && /bin/cp -Ra /htdocs/. /htdocs_provisioning/ && chown -R apache:apache /htdocs_provisioning && find /htdocs -type d -print0 | xargs -0 chmod 0755 && find /htdocs -type f -print0 | xargs -0 chmod 0644"]
+          command: ["/bin/ash", "-c", "sleep 1 && \
+          cp -Ra /htdocs/. /htdocs_provisioning/ && \
+          chown -R apache:apache /htdocs_provisioning && \
+          find /htdocs -type d -print0 | xargs -0 chmod 0755 && \
+          find /htdocs -type f -print0 | xargs -0 chmod 0644"]
           volumeMounts:
             - name: linkstack-sqlite
               mountPath: /htdocs_provisioning
