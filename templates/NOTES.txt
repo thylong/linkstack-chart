@@ -20,3 +20,6 @@
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:$CONTAINER_PORT
 {{- end }}
+2. Setup & cutomize your Linkstack
+- Setting up Linkstack currently requires accessing the application and going through the interactive setup as defined in this documentation: https://docs.linkstack.org/getting-started/setup/
+- Customization can be done later on through the dashboard
