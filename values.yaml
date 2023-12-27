@@ -15,6 +15,10 @@ linkstack:
     # https_server_name: 'example.com'
     log_level: 'info'
 
+# -- Specifies in which namespace linkstack release should be deployed
+# Will be deployed to the default namespace if not specified
+namespace: ""
+
 nameOverride: ""
 fullnameOverride: ""
 
@@ -52,6 +56,13 @@ securityContext: {}
 # runAsGroup: 101
 # fsGroup: 101
 # readOnlyRootFilesystem: true
+
+# -- Restrict network permissions using Kubernetes L4 network policies
+networkPolicy:
+  enabled: false
+  ports:
+    - port: 443
+    - port: 80
 
 service:
   type: ClusterIP
