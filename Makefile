@@ -3,6 +3,10 @@
 .PHONY: test
 test: helm-test ## Alias to helm tests
 
+.PHONY: helm-package
+helm-package:  ## Create a chart package in ./charts
+	helm package . --destination ./charts
+
 .PHONY: helm-template
 helm-template:  ## Apply chart locally to view generated Kubernetes definitions
 	helm template --values=values.yaml .
