@@ -1,6 +1,7 @@
 # linkstack
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-yellow.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Release Charts](https://github.com/thylong/linkstack-chart/actions/workflows/release.yml/badge.svg)](https://github.com/thylong/linkstack-chart/actions/workflows/release.yml)
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A LinkStack unofficial Helm chart
@@ -12,16 +13,29 @@ The chart currently supports:
 - Basic setup with mysql as backend
 - PersistentVolume to store data
 
-## Getting Started
+## Usage
 
-### Requirement
+[Helm](https://helm.sh) must be installed to use the charts.  Please refer to
+Helm's [documentation](https://helm.sh/docs) to get started.
 
-Helm (version >= 3) and a functional kubernetes cluster (>=1.24) are the sole dependencies.
+Once Helm has been set up correctly, add the repo as follows:
 
-### Basic install
+  helm repo add linkstack http://thylong.com/linkstack-chart/
+
+If you had already added this repo earlier, run `helm repo update` to retrieve
+the latest versions of the packages.  You can then run `helm search repo
+linkstack` to see the charts.
+
+### Install
 
 ```bash
 helm install -f values.yaml linkstack .
+```
+
+### Uninstall
+
+```bash
+helm uninstall linkstack
 ```
 
 ## Features considered
