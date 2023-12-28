@@ -1,6 +1,7 @@
 # linkstack
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-yellow.svg)](https://www.gnu.org/licenses/agpl-3.0)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 A LinkStack unofficial Helm chart
 
