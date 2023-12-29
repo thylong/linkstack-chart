@@ -1,0 +1,22 @@
+{{- if contains "sqlite" .Values.linkstack.backend }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "linkstack.fullname" . }}-litestream
+  {{- if ne .Values.namespace "" }}
+  namespace: {{ .Values.namespace }}
+  {{- end }}
+  labels:
+    {{- include "linkstack.labels" . | nindent 4 }}
+  # annotations:
+  #   "helm.sh/hook": pre-install
+  #   "helm.sh/hook-weight": "-5"
+data:
+  litestream.yml: |-
+    dbs:
+      - path: {{ .Values.litestream.path }}
+        replicas:
+          - url: {{ .Values.litestream.url }}
+            region: {{ .Values.litestream.region }}
+            skip-verify: {{ .Values.litestream.skipVerify }}
+{{- end }}

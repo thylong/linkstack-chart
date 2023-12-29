@@ -1,8 +1,14 @@
-# Default values for linkstack.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# -- Specifies in which namespace linkstack release should be deployed
+# Will be deployed to the default namespace if not specified
+namespace: ""
 
-# -- Linkstack specific configuration
+nameOverride: ""
+fullnameOverride: ""
+
+# -- (int) Number of linkstack pods
+replicaCount: 1
+
+# -- Linkstack container specific configuration
 linkstack:
   # -- Datastore to use (either sqlite or mysql)
   backend: sqlite
@@ -14,21 +20,55 @@ linkstack:
     # http_server_name: 'example.com'
     # https_server_name: 'example.com'
     log_level: 'info'
+  image:
+    repository: linkstackorg/linkstack
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  resources:
+    limits:
+      cpu: 250m
+      # -- PHP_MEMORY_LIMIT should be adjusted accordingly
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  # -- Additional volumeMounts on the output Deployment definition.
+  volumeMounts:
+    - name: linkstack-sqlite
+      mountPath: "/htdocs"
+      # SQLite & assets storage requires both RW permissions.
+      readOnly: false
 
-# -- Specifies in which namespace linkstack release should be deployed
-# Will be deployed to the default namespace if not specified
-namespace: ""
+# -- Litestream sidecar specific configuration (sqlite disaster-recovery tool)
+# This configuration won't be used if sqlite is not selected as backend.
+litestream:
+  image:
+    repository: litestream/litestream
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  limits:
+    cpu: 250m
+    memory: 256Mi
+  requests:
+    cpu: 125m
+    memory: 128Mi
+  path: /htdocs/database/database.sqlite
+  url: "s3://linkstack-backup-prod-eu/litestream"
+  region: "eu-west-1"
+  skipVerify: true
+  volumeMounts:
+    - name: linkstack-litestream
+      mountPath: /etc/litestream.yml
+      subPath: litestream.yml
 
-nameOverride: ""
-fullnameOverride: ""
-
-# -- (int) Number of linkstack pods
-replicaCount: 1
-
-image:
-  repository: linkstackorg/linkstack
-  pullPolicy: IfNotPresent
-  tag: "latest"
+# -- Additional volumes on the output Deployment definition.
+volumes:
+  - name: linkstack-sqlite
+    persistentVolumeClaim:
+      claimName: linkstack-sqlite-pvc
+  - name: linkstack-litestream
+    configMap:
+      name: linkstack-litestream
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -41,10 +81,16 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
-podLabels: {}
+service:
+  type: ClusterIP
+  port: 80
 
-podSecurityContext: {}
+# -- Restrict network permissions using Kubernetes L4 network policies
+networkPolicy:
+  enabled: false
+  ports:
+    - port: 443
+    - port: 80
 
 securityContext: {}
 #   capabilities:
@@ -57,16 +103,10 @@ securityContext: {}
 # fsGroup: 101
 # readOnlyRootFilesystem: true
 
-# -- Restrict network permissions using Kubernetes L4 network policies
-networkPolicy:
-  enabled: false
-  ports:
-    - port: 443
-    - port: 80
+podAnnotations: {}
+podLabels: {}
 
-service:
-  type: ClusterIP
-  port: 80
+podSecurityContext: {}
 
 ingress:
   enabled: false
@@ -83,16 +123,6 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-# -- The following values aligned with linkstack default PHP values.
-resources:
-  limits:
-    cpu: 250m
-    # -- PHP_MEMORY_LIMIT should be adjusted accordingly
-    memory: 512Mi
-  requests:
-    cpu: 250m
-    memory: 512Mi
-
 # -- HPA rules.
 autoscaling:
   enabled: false
@@ -100,19 +130,6 @@ autoscaling:
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
-
-# -- Additional volumes on the output Deployment definition.
-volumes:
-  - name: linkstack-sqlite
-    persistentVolumeClaim:
-      claimName: linkstack-sqlite-pvc
-
-# -- Additional volumeMounts on the output Deployment definition.
-volumeMounts:
-  - name: linkstack-sqlite
-    mountPath: "/htdocs"
-    # SQLite & assets storage requires both RW permissions.
-    readOnly: false
 
 # -- Assign pods to nodes matching specific label.
 nodeSelector: {}
