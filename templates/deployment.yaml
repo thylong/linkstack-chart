@@ -31,7 +31,9 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: cp
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.linkstack.image.repository }}:{{ .Values.linkstack.image.tag | default .Chart.AppVersion }}"
+          resources:
+            {{- toYaml .Values.linkstack.resources | nindent 12 }}
           command: ["/bin/ash", "-c", "sleep 1 && \
           cp -Ra /htdocs/. /htdocs_provisioning/ && \
           chown -R apache:apache /htdocs_provisioning && \
@@ -44,8 +46,8 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.linkstack.image.repository }}:{{ .Values.linkstack.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.linkstack.image.pullPolicy }}
           env:
           {{- range $key, $value := .Values.linkstack.env }}
           - name: {{ $key | upper | replace "." "_" }}
@@ -64,11 +66,36 @@ spec:
               path: /
               port: http
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
+            {{- toYaml .Values.linkstack.resources | nindent 12 }}
+          {{- with .Values.linkstack.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        {{- if contains "sqlite" .Values.linkstack.backend }}
+        - name: litestream
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.litestream.image.repository }}:{{ .Values.litestream.image.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.litestream.pullPolicy }}
+          resources:
+            {{- toYaml .Values.litestream.resources | nindent 12 }}
+          args: ["replicate"]
+          env:
+          - name: LITESTREAM_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: litestream
+                key: LITESTREAM_ACCESS_KEY_ID
+          - name: LITESTREAM_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: litestream
+                key: LITESTREAM_SECRET_ACCESS_KEY
+          {{- with .Values.litestream.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

@@ -1,8 +1,6 @@
 # linkstack
 
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-yellow.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Release Charts](https://github.com/thylong/linkstack-chart/actions/workflows/release.yml/badge.svg)](https://github.com/thylong/linkstack-chart/actions/workflows/release.yml)
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
 
 A LinkStack unofficial Helm chart
 
@@ -13,31 +11,16 @@ The chart currently supports:
 - Basic setup with mysql as backend
 - PersistentVolume to store data
 
-## Usage
+## Getting Started
 
-[Helm](https://helm.sh) must be installed to use the charts.  Please refer to
-Helm's [documentation](https://helm.sh/docs) to get started.
+### Requirement
 
-Once Helm has been set up correctly, add the repo as follows:
+Helm (version >= 3) and a functional kubernetes cluster (>=1.24) are the sole dependencies.
 
-```bash
-helm repo add linkstack http://thylong.com/linkstack-chart/
-```
-
-If you had already added this repo earlier, run `helm repo update` to retrieve
-the latest versions of the packages.  You can then run `helm search repo
-linkstack` to see the charts.
-
-### Install
+### Basic install
 
 ```bash
 helm install -f values.yaml linkstack .
-```
-
-### Uninstall
-
-```bash
-helm uninstall linkstack
 ```
 
 ## Features considered
@@ -57,22 +40,22 @@ helm uninstall linkstack
 | affinity | object | `{}` | Affinity rules to constrain pod scheduling to specific node(s) matching rules. |
 | autoscaling | object | `{"enabled":false,"maxReplicas":10,"minReplicas":1,"targetCPUUtilizationPercentage":80}` | HPA rules. |
 | fullnameOverride | string | `""` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"linkstackorg/linkstack"` |  |
-| image.tag | string | `"latest"` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` | Name of the ingress class to route through this application |
 | ingress.enabled | bool | `false` |  |
-| linkstack | object | `{"backend":"sqlite","env":{"log_level":"info","php_memory_limit":"512M","tz":"Europe/Paris","upload_max_filesize":"8M"}}` | Linkstack specific configuration |
+| linkstack | object | `{"backend":"sqlite","env":{"log_level":"info","php_memory_limit":"512M","tz":"Europe/Paris","upload_max_filesize":"8M"},"image":{"pullPolicy":"IfNotPresent","repository":"linkstackorg/linkstack","tag":"latest"},"resources":{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"512Mi"}},"volumeMounts":[{"mountPath":"/htdocs","name":"linkstack-sqlite","readOnly":false}]}` | Linkstack container specific configuration |
 | linkstack.backend | string | `"sqlite"` | Datastore to use (either sqlite or mysql) |
+| linkstack.resources.limits.memory | string | `"512Mi"` | PHP_MEMORY_LIMIT should be adjusted accordingly |
+| linkstack.volumeMounts | list | `[{"mountPath":"/htdocs","name":"linkstack-sqlite","readOnly":false}]` | Additional volumeMounts on the output Deployment definition. |
+| litestream | object | `{"image":{"pullPolicy":"IfNotPresent","repository":"litestream/litestream","tag":"latest"},"limits":{"cpu":"250m","memory":"256Mi"},"path":"/htdocs/database/database.sqlite","region":"eu-west-1","requests":{"cpu":"125m","memory":"128Mi"},"skipVerify":true,"url":"s3://linkstack-backup-prod-eu/litestream","volumeMounts":[{"mountPath":"/etc/litestream.yml","name":"linkstack-litestream","subPath":"litestream.yml"}]}` | Litestream sidecar specific configuration (sqlite disaster-recovery tool) This configuration won't be used if sqlite is not selected as backend. |
 | nameOverride | string | `""` |  |
+| namespace | string | `""` | Specifies in which namespace linkstack release should be deployed Will be deployed to the default namespace if not specified |
+| networkPolicy | object | `{"enabled":false,"ports":[{"port":443},{"port":80}]}` | Restrict network permissions using Kubernetes L4 network policies |
 | nodeSelector | object | `{}` | Assign pods to nodes matching specific label. |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
 | replicaCount | int | `1` | Number of linkstack pods |
-| resources | object | `{"limits":{"cpu":"250m","memory":"512Mi"},"requests":{"cpu":"250m","memory":"512Mi"}}` | The following values aligned with linkstack default PHP values. |
-| resources.limits.memory | string | `"512Mi"` | PHP_MEMORY_LIMIT should be adjusted accordingly |
 | securityContext | object | `{}` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
@@ -81,8 +64,7 @@ helm uninstall linkstack
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
 | tolerations | list | `[]` | Tolerations lift taint constraints with a tradeoff on scheduling guarantees. |
-| volumeMounts | list | `[{"mountPath":"/htdocs","name":"linkstack-sqlite","readOnly":false}]` | Additional volumeMounts on the output Deployment definition. |
-| volumes | list | `[{"name":"linkstack-sqlite","persistentVolumeClaim":{"claimName":"linkstack-sqlite-pvc"}}]` | Additional volumes on the output Deployment definition. |
+| volumes | list | `[{"name":"linkstack-sqlite","persistentVolumeClaim":{"claimName":"linkstack-sqlite-pvc"}},{"configMap":{"name":"linkstack-litestream"},"name":"linkstack-litestream"}]` | Additional volumes on the output Deployment definition. |
 
 ## License
 
