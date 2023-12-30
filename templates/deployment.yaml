@@ -83,10 +83,24 @@ spec:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+              - name: User-Agent
+                value: LivenessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            failureThreshold: 2
+            timeoutSeconds: 3
           readinessProbe:
             httpGet:
               path: /
               port: http
+              httpHeaders:
+              - name: User-Agent
+                value: ReadinessProbe
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            failureThreshold: 2
+            timeoutSeconds: 3
           resources:
             {{- toYaml .Values.linkstack.resources | nindent 12 }}
           {{- with .Values.linkstack.volumeMounts }}
