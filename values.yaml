@@ -42,6 +42,7 @@ linkstack:
 # -- Litestream sidecar specific configuration (sqlite disaster-recovery tool)
 # This configuration won't be used if sqlite is not selected as backend.
 litestream:
+  enabled: false
   image:
     repository: litestream/litestream
     pullPolicy: IfNotPresent
@@ -53,7 +54,7 @@ litestream:
     cpu: 125m
     memory: 128Mi
   path: /htdocs/database/database.sqlite
-  url: "s3://linkstack-backup-prod-eu/litestream"
+  url: "s3://linkstack-backup/litestream"
   region: "eu-west-1"
   skipVerify: true
   volumeMounts:
