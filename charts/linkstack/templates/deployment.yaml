@@ -30,6 +30,9 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
+        {{- with .Values.additionalInitContainers }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         - name: cp
           image: "{{ .Values.linkstack.image.repository }}:{{ .Values.linkstack.image.tag | default .Chart.AppVersion }}"
           resources:
@@ -50,16 +53,10 @@ spec:
             {{- toYaml .Values.litestream.resources | nindent 12 }}
           args: ['restore', '-if-db-not-exists', '-if-replica-exists', '{{ .Values.litestream.path }}']
           env:
-          - name: LITESTREAM_ACCESS_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                name: litestream
-                key: LITESTREAM_ACCESS_KEY_ID
-          - name: LITESTREAM_SECRET_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: litestream
-                key: LITESTREAM_SECRET_ACCESS_KEY
+          {{- range $key, $value := .Values.litestream.env }}
+          - name: {{ $key | upper | replace "." "_" }}
+            value: {{ $value | quote }}
+          {{- end }}
           {{- with .Values.litestream.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
@@ -118,16 +115,10 @@ spec:
             {{- toYaml .Values.litestream.resources | nindent 12 }}
           args: ["replicate"]
           env:
-          - name: LITESTREAM_ACCESS_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                name: litestream
-                key: LITESTREAM_ACCESS_KEY_ID
-          - name: LITESTREAM_SECRET_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: litestream
-                key: LITESTREAM_SECRET_ACCESS_KEY
+          {{- range $key, $value := .Values.litestream.env }}
+          - name: {{ $key | upper | replace "." "_" }}
+            value: {{ $value | quote }}
+          {{- end }}
           {{- with .Values.litestream.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
