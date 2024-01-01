@@ -1,0 +1,8 @@
+# Match any file or path named .helmignore
+.helmignore
+
+# Match any file or path named .git
+.git
+
+# Match any file or path named .git
+.github
