@@ -23,3 +23,13 @@
 2. Setup & cutomize your Linkstack
 - Setting up Linkstack currently requires accessing the application and going through the interactive setup as defined in this documentation: https://docs.linkstack.org/getting-started/setup/
 - Customization can be done later on through the dashboard
+
+{{- if and (contains "sqlite" .Values.linkstack.backend) (.Values.litestream.enabled) }}
+Litestream is enabled.
+This disaster recovery tool allows you to continuously stream SQLite changes to AWS S3, Azure Blob Storage, Google Cloud Storage, SFTP, or NFS. Quickly recover to the point of failure if your server goes down.
+Please make sure that litestream configuration is working as expected. The best way is check litestream container logs:
+  kubectl --namespace {{ .Release.Namespace }} logs -f $POD_NAME -c litestream
+{{- else if contains "sqlite" .Values.linkstack.backend }}
+Litestream is disabled!
+Your SQLite backend is stored on a PersistentVolume, which provides some durability guarantees but in case of volume removal, you could loose data !
+{{- end }}
