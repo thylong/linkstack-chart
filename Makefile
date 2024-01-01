@@ -1,12 +1,8 @@
 .DEFAULT_GOAL := help
 
-.PHONY: docs
-package:  ## Create a chart package in ./charts
-	helm package . --destination ./charts
-
 .PHONY: package
 package:  ## Create a chart package in ./charts
-	helm package . --destination ./charts
+	helm package ./linkstack --destination ./charts
 
 .PHONY: template
 template:  ## Apply chart locally to view generated Kubernetes definitions
