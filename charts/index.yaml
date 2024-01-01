@@ -1,0 +1,40 @@
+apiVersion: v1
+entries:
+  linkstack:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-01T16:43:08.739583+01:00"
+    description: A LinkStack unofficial Helm chart
+    digest: 8623af27f960d2758e63b34192fddae64d7587c3b3ee03f0aa9f7bf3557da89a
+    home: https://linkstack.org/
+    icon: https://raw.githubusercontent.com/LinkStackOrg/LinkStack/main/assets/linkstack/icons/linkstack.svg
+    keywords:
+    - PHP
+    - linkstack
+    maintainers:
+    - email: thylong@pm.me
+      name: Théotime LEVEQUE
+    name: linkstack
+    type: application
+    urls:
+    - linkstack-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-01T16:43:08.739161+01:00"
+    description: A LinkStack unofficial Helm chart
+    digest: b287d7567fd6c77f194cb7cdf0993be196b7ccca8872b12180d00e4cf236e7d0
+    home: https://linkstack.org/
+    icon: https://raw.githubusercontent.com/LinkStackOrg/LinkStack/main/assets/linkstack/icons/linkstack.svg
+    keywords:
+    - PHP
+    - linkstack
+    maintainers:
+    - email: thylong@pm.me
+      name: Théotime LEVEQUE
+    name: linkstack
+    type: application
+    urls:
+    - linkstack-0.1.0.tgz
+    version: 0.1.0
+generated: "2024-01-01T16:43:08.735482+01:00"

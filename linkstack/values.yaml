@@ -106,7 +106,6 @@ securityContext: {}
 
 podAnnotations: {}
 podLabels: {}
-
 podSecurityContext: {}
 
 ingress:
