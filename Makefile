@@ -1,15 +1,23 @@
 .DEFAULT_GOAL := help
 
-.PHONY: test
-test: helm-test ## Alias to helm tests
-
-.PHONY: helm-package
-helm-package:  ## Create a chart package in ./charts
+.PHONY: docs
+package:  ## Create a chart package in ./charts
 	helm package . --destination ./charts
 
-.PHONY: helm-template
-helm-template:  ## Apply chart locally to view generated Kubernetes definitions
+.PHONY: package
+package:  ## Create a chart package in ./charts
+	helm package . --destination ./charts
+
+.PHONY: template
+template:  ## Apply chart locally to view generated Kubernetes definitions
 	helm template --values=values.yaml .
+
+.PHONY: lint
+lint: ## Lint helm templates
+	helm lint --strict ./
+
+.PHONY: test
+test: helm-test ## Run all tests
 
 .PHONY: helm-test
 helm-test:  ## Run helm tests
