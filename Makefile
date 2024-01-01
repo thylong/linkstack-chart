@@ -12,6 +12,11 @@ template:  ## Apply chart locally to view generated Kubernetes definitions
 lint: ## Lint helm templates
 	helm lint --strict ./charts/linkstack
 
+.PHONY: docs
+docs: ## Lint helm templates
+	helm-docs -o README.md -t ./README.md.gotmpl
+	cp charts/linkstack/README.md README.md
+
 .PHONY: test
 test: helm-test ## Run all tests
 

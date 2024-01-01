@@ -6,7 +6,7 @@
 
 {{ template "chart.description" . }}
 
-This helm chart offers a way to schedule a [linstack](https://linkstack.org/) instance on a K8s cluster.
+This helm chart offers a way to schedule a [linkstack](https://linkstack.org/) instance on a K8s cluster.
 
 The chart currently supports:
 - Basic setup with sqlite as backend
@@ -19,16 +19,67 @@ The chart currently supports:
 
 Helm (version >= 3) and a functional kubernetes cluster (>=1.24) are the sole dependencies.
 
-### Basic install
+## Install
+
+To install a simple linkstack instance with sqlite as a backend:
+```bash
+helm repo add linkstack https://thylong.github.io/linkstack-chart
+
+helm install linkstack linkstack/linkstack
+```
+
+### Enable litestream
+
+You can provide a `values.yaml` file with custom configuration.
+To run sqlite with [litestream](https://litestream.io/) as a sidecar, create the following file:
+
+```yaml
+# Example of values.yaml
+# [...]
+litestream:
+  enabled: true
+  image:
+    repository: litestream/litestream
+    pullPolicy: IfNotPresent
+    tag: "latest"
+  limits:
+    cpu: 250m
+    memory: 256Mi
+  requests:
+    cpu: 125m
+    memory: 128Mi
+  path: /htdocs/database/database.sqlite
+  url: "s3://<your_s3_bucket>/<path_to_specific_directory>"
+  region: "<your_s3_bucket_region>"
+  skipVerify: true
+  volumeMounts:
+    - name: linkstack-litestream
+      mountPath: /etc/litestream.yml
+      subPath: litestream.yml
+# [...]
+```
+
+Your will have to create a K8s secret to access the S3 bucket:
 
 ```bash
-helm install -f values.yaml linkstack .
+kubectl create secret generic litestream \
+    --from-literal=LITESTREAM_ACCESS_KEY_ID="my_access_key_id" \
+    --from-literal=LITESTREAM_SECRET_ACCESS_KEY="my_secret_access_key"
+```
+
+Then run :
+
+```bash
+helm repo add linkstack https://thylong.github.io/linkstack-chart
+
+helm install linkstack linkstack/linkstack --values=values.yaml
 ```
 
 ## Features considered
 
-- [ ] Optional pre-defined Network Policy
-- [ ] Optional pre-defined securityContext
+- [x] Optional pre-defined Network Policy
+- [x] Optional pre-defined securityContext
+- [x] SQLite disaster recovery with litestream
 - [ ] Already setup linkstack installation through Helm
 
 ## References
