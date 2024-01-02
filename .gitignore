@@ -8,3 +8,6 @@ deploy/**/Chart.lock
 
 # MacOS
 .DS_Store
+
+# Avoid local development files being versioned
+values-override.yaml
