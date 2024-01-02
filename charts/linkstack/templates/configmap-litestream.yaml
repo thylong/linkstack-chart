@@ -13,6 +13,10 @@ metadata:
   #   "helm.sh/hook-weight": "-5"
 data:
   litestream.yml: |-
+    logging:
+      level: info
+      type: json
+      stderr: false
     dbs:
       - path: {{ .Values.litestream.path }}
         replicas:
