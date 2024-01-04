@@ -14,7 +14,7 @@ metadata:
 data:
   litestream.yml: |-
     logging:
-      level: info
+      level: debug
       type: json
       stderr: false
     dbs:

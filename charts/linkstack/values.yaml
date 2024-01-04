@@ -13,13 +13,20 @@ linkstack:
   # -- Datastore to use (either sqlite or mysql)
   backend: sqlite
   env:
-    php_memory_limit: 512M
-    upload_max_filesize: '8M'
-    tz: 'Europe/Paris'
-    # server_admin: 'admin@example.com'
-    # http_server_name: 'example.com'
-    # https_server_name: 'example.com'
-    log_level: 'info'
+  - name: php_memory_limit
+    value: 512M
+  - name: upload_max_filesize
+    value: 8M
+  - name: tz
+    value: 'Europe/Paris'
+  - name: log_level
+    value: info
+  # - name: server_admin
+  #   value: admin@example.com
+  # - name: http_server_name
+  #   value: 'example.com'
+  # - name: https_server_name
+  #   value: 'example.com'
   image:
     repository: linkstackorg/linkstack
     pullPolicy: IfNotPresent
@@ -34,10 +41,10 @@ linkstack:
       memory: 512Mi
   # -- Additional volumeMounts on the output Deployment definition.
   volumeMounts:
-    - name: linkstack-sqlite
-      mountPath: "/htdocs"
-      # SQLite & assets storage requires both RW permissions.
-      readOnly: false
+  - name: linkstack-sqlite
+    mountPath: "/htdocs"
+    # SQLite & assets storage requires both RW permissions.
+    readOnly: false
 
 # -- Litestream sidecar specific configuration (sqlite disaster-recovery tool)
 # This configuration won't be used if sqlite is not selected as backend.
@@ -54,23 +61,34 @@ litestream:
     requests:
       cpu: 125m
       memory: 128Mi
+  env:
+  - name: LITESTREAM_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        name: litestream
+        key: LITESTREAM_ACCESS_KEY_ID
+  - name: LITESTREAM_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: litestream
+        key: LITESTREAM_SECRET_ACCESS_KEY
   path: /htdocs/database/database.sqlite
   url: "s3://linkstack-backup/litestream"
   region: "eu-west-1"
   skipVerify: true
   volumeMounts:
-    - name: linkstack-litestream
-      mountPath: /etc/litestream.yml
-      subPath: litestream.yml
+  - name: linkstack-litestream
+    mountPath: /etc/litestream.yml
+    subPath: litestream.yml
 
 # -- Additional volumes on the output Deployment definition.
 volumes:
-  - name: linkstack-sqlite
-    persistentVolumeClaim:
-      claimName: linkstack-sqlite-pvc
-  - name: linkstack-litestream
-    configMap:
-      name: linkstack-litestream
+- name: linkstack-sqlite
+  persistentVolumeClaim:
+    claimName: linkstack-sqlite-pvc
+- name: linkstack-litestream
+  configMap:
+    name: linkstack-litestream
 
 serviceAccount:
   # -- Specifies whether a service account should be created
@@ -91,8 +109,8 @@ service:
 networkPolicy:
   enabled: false
   ports:
-    - port: 443
-    - port: 80
+  - port: 443
+  - port: 80
 
 securityContext: {}
 #   capabilities:
