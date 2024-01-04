@@ -39,7 +39,9 @@ spec:
           cp -Ra /htdocs/. /htdocs_provisioning/ && \
           chown -R apache:apache /htdocs_provisioning && \
           find /htdocs -type d -print0 | xargs -0 chmod 0755 && \
-          find /htdocs -type f -print0 | xargs -0 chmod 0644 || echo \"/htdocs is not empty. No files copied.\""]
+          find /htdocs -type f -print0 | xargs -0 chmod 0644 && \
+          echo \"/htdocs was empty. Files copied to /htdocs.\" || \
+          echo \"/htdocs is not empty. No files copied.\""]
           volumeMounts:
             - name: linkstack-sqlite
               mountPath: /htdocs_provisioning
