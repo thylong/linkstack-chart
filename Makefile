@@ -10,7 +10,7 @@ template:  ## Apply chart locally to view generated Kubernetes definitions
 
 .PHONY: lint
 lint: ## Lint helm templates
-	helm lint --strict ./charts/linkstack
+	helm lint --strict --values=charts/linkstack/values.yaml ./charts/linkstack
 
 .PHONY: docs
 docs: ## Lint helm templates
