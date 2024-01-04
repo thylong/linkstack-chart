@@ -10,6 +10,7 @@ spec:
     storage: 1Gi
   accessModes:
     - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
   hostPath:
     path: /htdocs
 {{- end }}
