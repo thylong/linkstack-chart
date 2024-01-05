@@ -30,6 +30,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
+        {{- if not .Values.objectStorageBackup.enabled }} # files will be copied from Docker image
         - name: cp
           image: "{{ .Values.linkstack.image.repository }}:{{ .Values.linkstack.image.tag | default .Chart.AppVersion }}"
           resources:
@@ -45,20 +46,54 @@ spec:
           volumeMounts:
             - name: linkstack-sqlite
               mountPath: /htdocs_provisioning
-        {{- if and (contains "sqlite" .Values.linkstack.backend) (.Values.litestream.enabled) }}
-        - name: init-litestream
-          image: "{{ .Values.litestream.image.repository }}:{{ .Values.litestream.image.tag | default "latest" }}"
+        {{- else }} # files will be copied from remote backup storage
+        - name: restore-storage
+          image: "rclone/rclone"
+          imagePullPolicy: IfNotPresent
           resources:
-            {{- toYaml .Values.litestream.resources | nindent 12 }}
-          args: ['restore', '-if-db-not-exists', '-if-replica-exists', '{{ .Values.litestream.path }}']
-          {{- with .Values.litestream.env }}
+            {{- toYaml .Values.linkstack.resources | nindent 12 }}
+          command: ["sh", "-c", "rclone sync \
+            {{ .Values.objectStorageBackup.rcloneBucketPath }} /htdocs \
+            --s3-access-key-id=${RCLONE_CONFIG_S3_ACCESS_KEY_ID} \
+            --s3-secret-access-key=${RCLONE_CONFIG_S3_SECRET_ACCESS_KEY} \
+            --s3-region={{ .Values.objectStorageBackup.rcloneBucketRegion }} \
+            --transfers 15 \
+            --checkers 30 \
+            --use-json-log \
+            --s3-env-auth=true \
+            --s3-provider={{ .Values.objectStorageBackup.rcloneBucketProvider }} \
+            --no-check-certificate \
+            --ignore-checksum"
+          ]
           env:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.litestream.volumeMounts }}
+          - name: RCLONE_CONFIG_S3_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: rclone
+                key: AWS_ACCESS_KEY_ID
+          - name: RCLONE_CONFIG_S3_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: rclone
+                key: AWS_SECRET_ACCESS_KEY
+          - name: RCLONE_CONFIG_S3_TYPE
+            value: s3
+          {{- with .Values.linkstack.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+        - name: restore-permissions # required since rclone doesn't handle permissions at all
+          image: "linkstackorg/linkstack"
+          resources:
+            {{- toYaml .Values.linkstack.resources | nindent 12 }}
+          command: ["/bin/ash", "-c", "sleep 1 && \
+          chown -R apache:apache /htdocs && \
+          find /htdocs -type d -print0 | xargs -0 chmod 0755 && \
+          find /htdocs -type f -print0 | xargs -0 chmod 0644 && \
+          echo \"/Permissions restored on /htdocs.\""]
+          volumeMounts:
+            - name: linkstack-sqlite
+              mountPath: /htdocs
         {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -102,25 +137,6 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-        {{- if and (contains "sqlite" .Values.linkstack.backend) (.Values.litestream.enabled) }}
-        - name: litestream
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.litestream.image.repository }}:{{ .Values.litestream.image.tag | default "latest" }}"
-          imagePullPolicy: {{ .Values.litestream.pullPolicy }}
-          resources:
-            {{- toYaml .Values.litestream.resources | nindent 12 }}
-          args: ["replicate"]
-          env:
-          {{- with .Values.litestream.env }}
-          env:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.litestream.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-        {{- end }}
       {{- with .Values.volumes }}
       volumes:
         {{- toYaml . | nindent 8 }}

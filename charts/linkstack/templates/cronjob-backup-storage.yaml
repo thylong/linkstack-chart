@@ -1,0 +1,53 @@
+{{- if .Values.objectStorageBackup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-job
+spec:
+  schedule: "*/10 * * * *"  # Runs every 10 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: sync-storage
+            image: "rclone/rclone"
+            imagePullPolicy: IfNotPresent
+            resources:
+              {{- toYaml .Values.linkstack.resources | nindent 12 }}
+            command: ["sh", "-c", "rclone sync \
+              /htdocs :s3:linkstack-backup-prod-eu/linkstack \
+              --s3-access-key-id=${RCLONE_CONFIG_S3_ACCESS_KEY_ID} \
+              --s3-secret-access-key=${RCLONE_CONFIG_S3_SECRET_ACCESS_KEY} \
+              --s3-region=us-east-1 \
+              --transfers 15 \
+              --checkers 30 \
+              --use-json-log \
+              --s3-env-auth=true \
+              --s3-provider=AWS \
+              --no-check-certificate \
+              --ignore-checksum"
+            ]
+            env:
+              - name: RCLONE_CONFIG_S3_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: litestream
+                    key: LITESTREAM_ACCESS_KEY_ID
+              - name: RCLONE_CONFIG_S3_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: litestream
+                    key: LITESTREAM_SECRET_ACCESS_KEY
+              - name: RCLONE_CONFIG_S3_TYPE
+                value: s3
+            {{- with .Values.linkstack.volumeMounts }}
+            volumeMounts:
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.volumes }}
+          volumes:
+            {{- toYaml . | nindent 10 }}
+          {{- end }}
+{{- end }}
