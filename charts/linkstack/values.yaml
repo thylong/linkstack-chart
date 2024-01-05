@@ -81,6 +81,27 @@ litestream:
     mountPath: /etc/litestream.yml
     subPath: litestream.yml
 
+# -- Helper to restore data from remote source instead of Docker image default content (S3, GCS, etc)
+objectStorageBackup:
+  enabled: true
+  env: []
+  # rcloneBucketProvider: AWS
+  # rcloneBucketRegion: us-east-1
+  # rcloneBucketPath: ":s3:my-backup-bucket/linkstack"
+  # env:
+  # - name: RCLONE_CONFIG_S3_ACCESS_KEY_ID
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: rclone
+  #       key: AWS_ACCESS_KEY_ID
+  # - name: RCLONE_CONFIG_S3_SECRET_ACCESS_KEY
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: rclone
+  #       key: AWS_SECRET_ACCESS_KEY
+  # - name: RCLONE_CONFIG_S3_TYPE
+  #   value: s3
+
 # -- Additional volumes on the output Deployment definition.
 volumes:
 - name: linkstack-sqlite

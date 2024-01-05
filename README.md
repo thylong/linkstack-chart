@@ -103,6 +103,7 @@ helm install linkstack linkstack/linkstack --values=values.yaml
 | namespace | string | `""` | Specifies in which namespace linkstack release should be deployed Will be deployed to the default namespace if not specified |
 | networkPolicy | object | `{"enabled":false,"ports":[{"port":443},{"port":80}]}` | Restrict network permissions using Kubernetes L4 network policies |
 | nodeSelector | object | `{}` | Assign pods to nodes matching specific label. |
+| objectStorageBackup | object | `{"enabled":true,"env":[]}` | Helper to restore data from remote source instead of Docker image default content (S3, GCS, etc) |
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
